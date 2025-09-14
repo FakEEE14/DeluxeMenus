@@ -55,51 +55,47 @@ public class RegistrableMenuCommand extends Command {
             return true;
         }
 
-        Map<String, String> argMap = null;
+        Map<String, String> argumentsMap = null;
         Map<String, String> menuArgumentNames = menu.options().arguments();
         if (!menuArgumentNames.isEmpty()) {
             plugin.debug(DebugLevel.LOWEST, Level.INFO, "has args");
-            argMap = new HashMap<>();
-            int index = 0;
-
+            argumentsMap = new HashMap<>();
             List<String> argumentNamesList = new ArrayList<>(menuArgumentNames.keySet());
-            for (String arg : argumentNamesList) {
+            for (int index = 0; index < argumentNamesList.size(); index++) {
+                String argName = argumentNamesList.get(index);
                 String value;
                 if (index < typedArgs.length) {
-                    if (index + 1 == menuArgumentNames.size()) {
-                        value = String.join(" ", Arrays.asList(typedArgs).subList(index, typedArgs.length));
-                    } else {
-                        value = typedArgs[index];
-                    }
+                    value = (index + 1 == menuArgumentNames.size())
+                            ? String.join(" ", Arrays.asList(typedArgs).subList(index, typedArgs.length))
+                            : typedArgs[index];
 
-                    String str = menuArgumentNames.get(arg);
-                    if ((value == null || value.trim().isEmpty()) && str !=null) {
-                        value = str;
-                        plugin.debug(DebugLevel.LOWEST, Level.INFO, "using default for arg: " + arg + " => " + value);
+                    String defaultValue = menuArgumentNames.get(argName);
+                    if ((value == null || value.trim().isEmpty()) && defaultValue != null) {
+                        value = defaultValue;
+                        plugin.debug(DebugLevel.LOWEST, Level.INFO, "using default for arg: " + argName + " => " + value);
                     }
                 } else {
-                    String defaultValue = menuArgumentNames.get(arg);
+                    String defaultValue = menuArgumentNames.get(argName);
                     if (defaultValue != null) {
-                        value = StringUtils.replacePlaceholders(defaultValue,(Player) sender);
-                        plugin.debug(DebugLevel.LOWEST, Level.INFO, "using default for missing arg: " + arg + " => " + value);
+                        value = StringUtils.replacePlaceholders(defaultValue, (Player) sender);
+                        plugin.debug(DebugLevel.LOWEST, Level.INFO, "using default for missing arg: " + argName + " => " + value);
                     } else {
                         if (menu.options().argumentsUsageMessage().isPresent()) {
-                            final String usageMessage = menu.options().argumentsUsageMessage().get();
-                            Msg.msg(sender, StringUtils.replacePlaceholders(usageMessage,(Player) sender));
+                            String usageMessage = menu.options().argumentsUsageMessage().get();
+                            Msg.msg(sender, StringUtils.replacePlaceholders(usageMessage, (Player) sender));
                         }
                         return true;
                     }
                 }
 
-                plugin.debug(DebugLevel.LOWEST, Level.INFO, "arg: " + arg + " => " + value);
-                argMap.put(arg, value);
-                index++;
+                plugin.debug(DebugLevel.LOWEST, Level.INFO, "arg: " + argName + " => " + value);
+                argumentsMap.put(argName, value);
             }
         }
 
         Player player = (Player) sender;
         plugin.debug(DebugLevel.LOWEST, Level.INFO, "opening menu: " + menu.options().name());
-        menu.openMenu(player, argMap, null);
+        menu.openMenu(player, argumentsMap, null);
         return true;
     }
 

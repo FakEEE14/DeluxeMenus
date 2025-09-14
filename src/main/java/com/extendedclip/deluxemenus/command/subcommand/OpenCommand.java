@@ -2,6 +2,7 @@ package com.extendedclip.deluxemenus.command.subcommand;
 
 import com.extendedclip.deluxemenus.DeluxeMenus;
 import com.extendedclip.deluxemenus.menu.Menu;
+import com.extendedclip.deluxemenus.utils.DebugLevel;
 import com.extendedclip.deluxemenus.utils.Messages;
 import com.extendedclip.deluxemenus.utils.StringUtils;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,32 +113,28 @@ public class OpenCommand extends SubCommand {
             placeholder = viewer;
         }
 
+        Map<String, String> argumentsMap = new HashMap<>();
         List<String> menuArgs = actualArgs.size() > 2 ? actualArgs.subList(2, actualArgs.size()) : new ArrayList<>();
         Map<String, String> menuArgumentNames = menu.get().options().arguments();
-        if (menuArgumentNames.isEmpty()) {
-            return;
-        }
-
-        Map<String, String> argumentsMap = new HashMap<>();
-        List<String> argumentNamesList = new ArrayList<>(menuArgumentNames.keySet());
-        for (int index = 0; index < argumentNamesList.size(); index++) {
-            String argumentName = argumentNamesList.get(index);
-            String valueToPut = null;
-            if (index < menuArgs.size()) {
-                if (index == argumentNamesList.size() - 1) {
-                    valueToPut = String.join(" ", menuArgs.subList(index, menuArgs.size()));
-                    argumentsMap.put(argumentName, valueToPut);
-                    break;
+        if (!menuArgumentNames.isEmpty()) {
+            plugin.debug(DebugLevel.LOWEST, Level.INFO, "has args");
+            List<String> argumentNamesList = new ArrayList<>(menuArgumentNames.keySet());
+            for (int index = 0; index < argumentNamesList.size(); index++) {
+                String argName = argumentNamesList.get(index);
+                String valueToPut = null;
+                if (index < menuArgs.size()) {
+                    valueToPut = (index == argumentNamesList.size() - 1)
+                            ? String.join(" ", menuArgs.subList(index, menuArgs.size()))
+                            : menuArgs.get(index);
+                } else {
+                    String defaultValue = menuArgumentNames.get(argName);
+                    if (defaultValue != null) {
+                        valueToPut = StringUtils.replacePlaceholders(defaultValue, placeholder);
+                    }
                 }
-                valueToPut = menuArgs.get(index);
-            } else {
-                String defaultValue = menuArgumentNames.get(argumentName);
-                if (defaultValue != null) {
-                    valueToPut = StringUtils.replacePlaceholders(defaultValue, placeholder);
+                if (valueToPut != null) {
+                    argumentsMap.put(argName, valueToPut);
                 }
-            }
-            if (valueToPut != null) {
-                argumentsMap.put(argumentName, valueToPut);
             }
         }
         menu.get().openMenu(viewer, argumentsMap, placeholder);
