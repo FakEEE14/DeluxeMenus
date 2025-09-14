@@ -233,6 +233,9 @@ public class MenuItem {
             }
         }
 
+        if (this.options.amount() != -1) {
+            amount = this.options.amount();
+        }
 
         if (this.options.dynamicAmount().isPresent()) {
             try {
@@ -240,8 +243,6 @@ public class MenuItem {
                 amount = Math.max(dynamicAmount, 1);
             } catch (final NumberFormatException ignored) {
             }
-        } else if (this.options.amount() != -1) {
-            amount = this.options.amount();
         }
 
         if (amount > itemStack.getMaxStackSize()) {
