@@ -240,7 +240,7 @@ public class MenuItem {
                 amount = Math.max(dynamicAmount, 1);
             } catch (final NumberFormatException ignored) {
             }
-        }else if (this.options.amount() != -1) {
+        } else if (this.options.amount() != -1) {
             amount = this.options.amount();
         }
 
@@ -638,3 +638,4 @@ public class MenuItem {
         return options;
     }
 }
+
