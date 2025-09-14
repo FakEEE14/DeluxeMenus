@@ -105,7 +105,7 @@ public class OpenCommand extends SubCommand {
                 plugin.sms(sender, Messages.PLAYER_IS_EXEMPT.message().replaceText(PLAYER_REPLACER_BUILDER.replacement(placeholderPlayer).build()));
                 return;
             }
-        }else {
+        } else {
             if (isPlayer && !sender.hasPermission("deluxemenus.open.others")) {
                 plugin.sms(sender, Messages.NO_PERMISSION);
                 return;
